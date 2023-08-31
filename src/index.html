@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>presentation</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/index.css" />
+		<style>
+      .axis path, .axis line{
+        stroke: rgb(0, 0, 0);;
+    }
+      .axis text{
+          font-family: sans-serif;
+          font-size: 15px;
+          fill: rgb(255, 255, 255);
+      }
+		</style>
+  </head>
+  
+  <body>
+    <header>
+      <h1>卡塔尔世界杯数据可视化</h1>
+      <div class="showTime">当前时间：2020年3月17-0时54分14秒</div>
+      <script>
+        var t = null;
+        t = setTimeout(time, 1000); //開始运行
+        function time() {
+          clearTimeout(t); //清除定时器
+          dt = new Date();
+          var y = dt.getFullYear();
+          var mt = dt.getMonth() + 1;
+          var day = dt.getDate();
+          var h = dt.getHours(); //获取时
+          var m = dt.getMinutes(); //获取分
+          var s = dt.getSeconds(); //获取秒
+          document.querySelector(".showTime").innerHTML =
+            "当前时间：" +
+            y +
+            "年" +
+            mt +
+            "月" +
+            day +
+            "日" +
+            h +
+            "时" +
+            m +
+            "分" +
+            s +
+            "秒";
+          t = setTimeout(time, 1000); //设定定时器，循环运行
+        }
+      </script>
+    </header>
+    <section class="mainbox">
+      <div class="column">
+        <div class="panel">
+          <div class="slidershow middle">
+
+            <div class="slides">
+              <input type="radio" name="r" id="r1" checked>
+              <input type="radio" name="r" id="r2" >
+              <input type="radio" name="r" id="r3">
+              <input type="radio" name="r" id="r4">
+              <input type="radio" name="r" id="r5">
+              <input type="radio" name="r" id="r6">
+              <div class="slide s1" id="app">
+                <p class="hl">StreamGraph:十六强球队历年进球数据<br/></p>
+                <p class="info">The original dataset founded on Kaggle contains all the international soccer matches from 1946 to the end of 2019.<br/></p>
+                <p class="hl"><br/></p>
+                <p class="info">巴西是世界第一足球大国，阿根廷是冠军有力竞争者，克罗地亚体量虽小但实力强劲<br/></p>
+                <svg id="streamgraph"></svg>
+              </div>
+              <div class="slide">
+                <p class="info">颜色代表rating，圆大小代表控球率，发散圆环代表其跑动距离，每个球员位置为其平均位置，通过这些数据可视化以及雷达图知，阿根廷进攻集中在中路以及右侧，对手则更多进攻左侧。
+                  限制好梅西则能很大程度上限制住阿根廷的进攻，而阿根廷则需要加强中场和前锋的连线</p>
+                <!-- <img src="./images/1.png" alt=""> -->
+                <svg id="ArgVsAus"></svg>
+              </div>
+              <div class="slide">
+                <div id="buttons" style="text-align: center;"></div>
+                <svg id="attackgraph"></svg>
+              </div>
+              <div class="slide">
+                <svg id="playerdata"></svg>
+              </div>
+              <div class="slide" id="teams">
+
+
+              </div>
+              <div class="slide" id="radar">
+               
+              </div>
+            </div>
+            <div id="info">
+              <p class="info">11111111<br/></p>
+            </div>
+            <div class="navigation">
+              <label for="r1" class="bar"></label>
+              <label for="r2" class="bar"></label>
+              <label for="r3" class="bar"></label>
+              <label for="r4" class="bar"></label>
+              <label for="r5" class="bar"></label>
+              <label for="r6" class="bar"></label>
+            </div>
+            <div class="order">
+              <p class="info2">&nbsp&nbsp&nbsp历年进球数
+                &nbsp&nbsp&nbsp&nbsp&nbspARG 2-1 AUS
+                &nbsp&nbsp&nbsp&nbsp&nbsp进攻分析
+                &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp阿根廷球员
+                &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp八强球队
+                &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp决赛球队<br/></p>
+            </div>
+          </div>
+          <div class="panel-footer"></div>
+        </div>
+       
+      </div>
+      
+    </section>
+    <script src="main.js"></script>
+    <script src="js/flexible.js"></script>
+    <script src="js/jquery.js"></script>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/china.js"></script>
+    <script src="js/myMap.js"></script>
+    <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+
+  <script type="text/javascript">
+    var dom = document.getElementById('teams');
+    var myChart = echarts.init(dom, null, {
+      renderer: 'canvas',
+      useDirtyRect: false
+    });
+    var app = {};
+    
+    var option;
+
+    // Schema:
+// date,AQIindex,PM2.5,PM10,CO,NO2,SO2
+const dataBJ = [
+  [3, 90, 6.7, 2, 27.8, 15, 12, '世界顶级'],
+];
+var dataGZ = [
+  [1, 95, 10.94, 5, 27.9, 47, 13, '发挥较差'],
+  
+];
+var dataSH = [
+  [5, 92, 13.61, 1, 26.4, 15, 16, '令人失望'],
+];
+var dataK = [
+  [15, 86, 3.5, 0, 27.3, 2.9, 6, '超常发挥'],
+];
+var dataP = [
+  [9, 88, 9.07, 0, 26.5, 15, 16, '中规中矩'],
+];
+var dataF = [
+  [4, 92, 9.01, 2, 26.2, 20, 11, '世界顶级'],
+];
+var dataM = [
+  [23, 83, 2.4, 0, 26.3, 3.4, 8, '超常发挥'],
+];
+var dataH = [
+  [8, 84, 5.4, 0, 26.6, 6.3, 9, '略有威胁'],
+];
+var schema = [
+  { name: 'date', index: 0, text: '世界排名' },
+  { name: 'AQIindex', index: 1, text: '综合实力' },
+  { name: 'PM25', index: 2, text: '球队身价' },
+  { name: 'PM10', index: 3, text: '夺冠次数' },
+  { name: 'CO', index: 4, text: '平均年龄' },
+  { name: 'NO2', index: 5, text: '夺冠占比' },
+  { name: 'SO2', index: 6, text: '世界杯进球数' },
+  { name: '等级', index: 7, text: '等级' }
+];
+var lineStyle = {
+  width: 2.5,
+  opacity: 0.5
+};
+option = {
+  backgroundColor: '#333',
+  legend: {
+    bottom: 50,
+    data: ['阿根廷', '巴西', '英格兰','克罗地亚','葡萄牙','法国','摩洛哥','荷兰'],
+    itemGap: 20,
+    textStyle: {
+      color: '#aaa',
+      fontSize: 20
+    }
+  },
+  tooltip: {
+    padding: 10,
+    backgroundColor: '#222',
+    borderColor: '#777',
+    borderWidth: 1
+  },
+  parallelAxis: [
+    {
+      dim: 0,
+      name: schema[0].text,
+      inverse: true,
+      max: 30,
+      nameLocation: 'start'
+    },
+    { dim: 1, name: schema[1].text, 
+    inverse: false,
+      max: 100,
+    },
+    { dim: 2, name: schema[2].text,inverse: false,
+      max: 15,
+      },
+    { dim: 3, name: schema[3].text,inverse: false,
+      max: 5, },
+    { dim: 4, name: schema[4].text,inverse: true,
+      max: 30, nameLocation: 'start'},
+    { dim: 5, name: schema[5].text ,inverse: false,
+      max: 50,},
+    { dim: 6, name: schema[6].text ,inverse: false,
+      max: 20,},
+    {
+      dim: 7,
+      name: schema[7].text,
+      type: 'category',
+      data: ['令人失望', '发挥较差', '中规中矩', '略有威胁', '超常发挥', '世界顶级']
+    }
+  ],
+  visualMap: {
+    show: true,
+    min: 80,
+    max: 100,
+    dimension: 1,
+    inRange: {
+      color: ['#d94e5d', '#eac736', '#50a3ab'].reverse()
+      // colorAlpha: [0, 1]
+    }
+  },
+  parallel: {
+    left: '5%',
+    right: '18%',
+    bottom: 100,
+    parallelAxisDefault: {
+      type: 'value',
+      name: '世界排名',
+      nameLocation: 'end',
+      nameGap: 20,
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 12
+      },
+      axisLine: {
+        lineStyle: {
+          color: '#aaa'
+        }
+      },
+      axisTick: {
+        lineStyle: {
+          color: '#777'
+        }
+      },
+      splitLine: {
+        show: false
+      },
+      axisLabel: {
+        color: '#fff'
+      }
+    }
+  },
+  series: [
+    {
+      name: '阿根廷',
+      type: 'parallel',
+      lineStyle: lineStyle,
+      data: dataBJ
+    },
+    {
+      name: '巴西',
+      type: 'parallel',
+      lineStyle: lineStyle,
+      data: dataSH
+    },
+    {
+      name: '英格兰',
+      type: 'parallel',
+      lineStyle: lineStyle,
+      data: dataGZ
+    },
+    {
+      name: '克罗地亚',
+      type: 'parallel',
+      lineStyle: lineStyle,
+      data: dataK
+    },{
+      name: '葡萄牙',
+      type: 'parallel',
+      lineStyle: lineStyle,
+      data: dataP
+    },{
+      name: '法国',
+      type: 'parallel',
+      lineStyle: lineStyle,
+      data: dataF
+    },{
+      name: '摩洛哥',
+      type: 'parallel',
+      lineStyle: lineStyle,
+      data: dataM
+    },{
+      name: '荷兰',
+      type: 'parallel',
+      lineStyle: lineStyle,
+      data: dataH
+    }
+  ]
+};
+
+
+    if (option && typeof option === 'object') {
+      myChart.setOption(option);
+    }
+
+    window.addEventListener('resize', myChart.resize);
+    </script>
+
+<script type="text/javascript">
+  var dom = document.getElementById('radar');
+  var myChart = echarts.init(dom, 'dark', {
+    renderer: 'canvas',
+    useDirtyRect: false
+  });
+  var app = {};
+  
+  var option;
+
+  option = {
+color: ['#67F9D8', '#FFE434', '#56A3F1', '#FF917C'],
+// title: {
+//   text: '阿根廷和法国教练对比（左）及明星球员对比图（右）'
+// },
+legend: {},
+radar: [
+  {
+    indicator: [
+      { text: '教练执教能力' },
+      { text: '教练执教年数' },
+      { text: '取得成就' },
+      { text: '队形阵容调整度' },
+      { text: '球员信任程度' }
+    ],
+    center: ['35%', '50%'],
+    radius: 120,
+    startAngle: 90,
+    splitNumber: 4,
+    shape: 'circle',
+    axisName: {
+      formatter: '【{value}】',
+      color: '#428BD4'
+    },
+    splitArea: {
+      areaStyle: {
+        color: ['#77EADF', '#26C3BE', '#64AFE9', '#428BD4'],
+        shadowColor: 'rgba(0, 0, 0, 0.2)',
+        shadowBlur: 10
+      }
+    },
+    axisLine: {
+      lineStyle: {
+        color: 'rgba(211, 253, 250, 0.8)'
+      }
+    },
+    splitLine: {
+      lineStyle: {
+        color: 'rgba(211, 253, 250, 0.8)'
+      }
+    }
+  },
+  {
+    indicator: [
+      { text: '职业成就', max: 100 },
+      { text: '个人能力', max: 100 },
+      { text: '球队作用', max: 100 },
+      { text: '精神意志', max: 100 },
+      { text: '年龄对比', max: 100 },
+      { text: '身价对比', max: 100 }
+    ],
+    center: ['75%', '50%'],
+    radius: 120,
+    axisName: {
+      color: '#fff',
+      backgroundColor: '#666',
+      borderRadius: 3,
+      padding: [3, 5]
+    }
+  }
+],
+series: [
+  {
+    type: 'radar',
+    emphasis: {
+      lineStyle: {
+        width: 4
+      }
+    },
+    data: [
+      {
+        value: [75, 4, 70, 95, 89],
+        name: '阿根廷主教练斯卡洛尼'
+      },
+      {
+        value: [95, 10, 95, 90, 94],
+        name: '法国主教练德尚',
+        areaStyle: {
+          color: 'rgba(255, 228, 52, 0.6)'
+        }
+      }
+    ]
+  },
+  {
+    type: 'radar',
+    radarIndex: 1,
+    data: [
+      {
+        value: [92, 95, 100, 100, 60, 30],
+        name: '阿根廷明星球员梅西',
+        symbol: 'rect',
+        symbolSize: 12,
+        lineStyle: {
+          type: 'dashed'
+        },
+        label: {
+          show: true,
+          formatter: function (params) {
+            return params.value;
+          }
+        }
+      },
+      {
+        value: [84, 89, 95, 90, 92, 95],
+        name: '法国明星球员姆巴佩',
+        areaStyle: {
+          color: new echarts.graphic.RadialGradient(0.1, 0.6, 1, [
+            {
+              color: 'rgba(255, 145, 124, 0.1)',
+              offset: 0
+            },
+            {
+              color: 'rgba(255, 145, 124, 0.9)',
+              offset: 1
+            }
+          ])
+        }
+      }
+    ]
+  }
+]
+};
+
+  if (option && typeof option === 'object') {
+    myChart.setOption(option);
+  }
+
+  window.addEventListener('resize', myChart.resize);
+</script>
+  </body>
+</html>
